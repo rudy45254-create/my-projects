@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Rudi Dev — Portfolio</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0a0a0f;
+      --surface: #13131a;
+      --border: #1e1e2e;
+      --accent: #00e5ff;
+      --accent2: #ff6b35;
+      --text: #f0f0f5;
+      --muted: #7a7a9a;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* NOISE OVERLAY */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 9999;
+      opacity: 0.4;
+    }
+
+    /* GLOW BLOBS */
+    .blob {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(120px);
+      pointer-events: none;
+      z-index: 0;
+    }
+    .blob-1 {
+      width: 500px; height: 500px;
+      background: rgba(0,229,255,0.07);
+      top: -100px; left: -100px;
+      animation: blobFloat 8s ease-in-out infinite;
+    }
+    .blob-2 {
+      width: 400px; height: 400px;
+      background: rgba(255,107,53,0.06);
+      bottom: 100px; right: -100px;
+      animation: blobFloat 10s ease-in-out infinite reverse;
+    }
+    @keyframes blobFloat {
+      0%, 100% { transform: translate(0,0); }
+      50% { transform: translate(30px, 20px); }
+    }
+
+    /* NAV */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      padding: 20px 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(10,10,15,0.8);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-logo {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 1.4rem;
+      letter-spacing: -0.5px;
+    }
+    .nav-logo span { color: var(--accent); }
+    .nav-links { display: flex; gap: 32px; }
+    .nav-links a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--text); }
+
+    /* HERO */
+    .hero {
+      position: relative;
+      z-index: 1;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 120px 40px 80px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(0,229,255,0.08);
+      border: 1px solid rgba(0,229,255,0.2);
+      color: var(--accent);
+      padding: 6px 16px;
+      border-radius: 100px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      margin-bottom: 28px;
+      opacity: 0;
+      animation: fadeUp 0.6s ease forwards 0.2s;
+    }
+    .hero-badge::before {
+      content: '';
+      width: 6px; height: 6px;
+      background: var(--accent);
+      border-radius: 50%;
+      box-shadow: 0 0 8px var(--accent);
+    }
+    .hero h1 {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(3rem, 8vw, 6rem);
+      font-weight: 800;
+      line-height: 1.0;
+      letter-spacing: -2px;
+      margin-bottom: 24px;
+      opacity: 0;
+      animation: fadeUp 0.7s ease forwards 0.4s;
+    }
+    .hero h1 .highlight {
+      color: transparent;
+      -webkit-text-stroke: 2px var(--accent);
+    }
+    .hero p {
+      max-width: 560px;
+      color: var(--muted);
+      font-size: 1.1rem;
+      line-height: 1.7;
+      margin-bottom: 40px;
+      opacity: 0;
+      animation: fadeUp 0.7s ease forwards 0.6s;
+    }
+    .hero-cta {
+      display: flex;
+      gap: 16px;
+      opacity: 0;
+      animation: fadeUp 0.7s ease forwards 0.8s;
+    }
+    .btn-primary {
+      background: var(--accent);
+      color: #000;
+      padding: 14px 28px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 0.9rem;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px rgba(0,229,255,0.3);
+    }
+    .btn-secondary {
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 14px 28px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 0.9rem;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .btn-secondary:hover {
+      border-color: var(--muted);
+      background: rgba(255,255,255,0.04);
+    }
+
+    /* SCROLL INDICATOR */
+    .scroll-line {
+      position: absolute;
+      bottom: 40px;
+      left: 40px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: var(--muted);
+      font-size: 0.75rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      opacity: 0;
+      animation: fadeUp 0.7s ease forwards 1.2s;
+    }
+    .scroll-line::before {
+      content: '';
+      width: 40px;
+      height: 1px;
+      background: var(--muted);
+    }
+
+    /* APPS SECTION */
+    .apps-section {
+      position: relative;
+      z-index: 1;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 80px 40px 120px;
+    }
+    .section-header {
+      display: flex;
+      align-items: baseline;
+      gap: 16px;
+      margin-bottom: 60px;
+    }
+    .section-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 2.5rem;
+      font-weight: 800;
+      letter-spacing: -1px;
+    }
+    .section-count {
+      font-size: 0.85rem;
+      color: var(--muted);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 4px 12px;
+      border-radius: 100px;
+    }
+
+    /* CARDS GRID */
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(460px, 1fr));
+      gap: 24px;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+      transition: transform 0.3s, border-color 0.3s, box-shadow 0.3s;
+      opacity: 0;
+      animation: fadeUp 0.7s ease forwards;
+    }
+    .card:nth-child(1) { animation-delay: 0.1s; }
+    .card:nth-child(2) { animation-delay: 0.25s; }
+
+    .card:hover {
+      transform: translateY(-6px);
+      border-color: rgba(0,229,255,0.25);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.4), 0 0 0 1px rgba(0,229,255,0.1);
+    }
+
+    .card-preview {
+      width: 100%;
+      height: 220px;
+      object-fit: cover;
+      object-position: top;
+      display: block;
+      background: var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+
+    /* STATIC PREVIEW */
+    .preview-wrapper {
+      width: 100%;
+      height: 220px;
+      overflow: hidden;
+      position: relative;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .preview-wrapper.finance-bg {
+      background: linear-gradient(135deg, #0d1f1a 0%, #0a1628 100%);
+    }
+    .preview-wrapper.arab-bg {
+      background: linear-gradient(135deg, #1a0d0a 0%, #1a1028 100%);
+    }
+    .preview-mockup {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      opacity: 0.9;
+    }
+    .mockup-icon {
+      font-size: 3.5rem;
+      filter: drop-shadow(0 0 20px rgba(255,255,255,0.2));
+    }
+    .mockup-bars {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      width: 160px;
+    }
+    .mockup-bar {
+      height: 8px;
+      border-radius: 100px;
+      background: rgba(255,255,255,0.1);
+    }
+    .mockup-bar.short { width: 60%; }
+    .mockup-bar.med { width: 80%; }
+    .mockup-bar.full { width: 100%; }
+    .finance-bg .mockup-bar { background: rgba(0,229,255,0.15); }
+    .arab-bg .mockup-bar { background: rgba(255,107,53,0.15); }
+    .preview-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to bottom, transparent 40%, var(--surface));
+      pointer-events: none;
+    }
+
+    .card-body {
+      padding: 28px;
+    }
+    .card-tag {
+      display: inline-block;
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      padding: 4px 10px;
+      border-radius: 4px;
+      margin-bottom: 14px;
+    }
+    .tag-finance {
+      background: rgba(0,229,255,0.1);
+      color: var(--accent);
+    }
+    .tag-edu {
+      background: rgba(255,107,53,0.1);
+      color: var(--accent2);
+    }
+    .card-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+      letter-spacing: -0.5px;
+    }
+    .card-desc {
+      color: var(--muted);
+      font-size: 0.92rem;
+      line-height: 1.65;
+      margin-bottom: 24px;
+    }
+    .card-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .card-chips {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .chip {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 0.75rem;
+      padding: 4px 10px;
+      border-radius: 100px;
+    }
+    .card-link {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--accent);
+      color: #000;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 0.85rem;
+      padding: 10px 20px;
+      border-radius: 8px;
+      white-space: nowrap;
+      transition: transform 0.2s, box-shadow 0.2s;
+      flex-shrink: 0;
+    }
+    .card-link:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0,229,255,0.3);
+    }
+    .card-link.orange {
+      background: var(--accent2);
+    }
+    .card-link.orange:hover {
+      box-shadow: 0 6px 20px rgba(255,107,53,0.3);
+    }
+    .card-link svg {
+      width: 14px; height: 14px;
+    }
+
+    /* FOOTER */
+    footer {
+      position: relative;
+      z-index: 1;
+      border-top: 1px solid var(--border);
+      padding: 32px 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    footer p {
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+    footer span { color: var(--accent); }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 768px) {
+      nav { padding: 16px 20px; }
+      .nav-links { display: none; }
+      .hero { padding: 100px 20px 60px; }
+      .hero h1 { font-size: 3rem; letter-spacing: -1px; }
+      .apps-section { padding: 60px 20px 80px; }
+      .cards-grid { grid-template-columns: 1fr; }
+      .card-footer { flex-direction: column; align-items: flex-start; gap: 16px; }
+      footer { flex-direction: column; gap: 8px; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="blob blob-1"></div>
+<div class="blob blob-2"></div>
+
+<nav>
+  <div class="nav-logo">Rudi<span>Dev</span></div>
+  <div class="nav-links">
+    <a href="#apps">Aplikasi</a>
+    <a href="/cdn-cgi/l/email-protection#4f3d3a2b260f2a222e2623612c2022">Kontak</a>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="hero-badge">Available — Open to collaboration</div>
+  <h1>Rudi<br/><span class="highlight">Suryadi</span></h1>
+  <p>Membangun aplikasi web yang berguna, fungsional, dan mudah digunakan. Dari tools keuangan hingga media pembelajaran interaktif.</p>
+  <div class="hero-cta">
+    <a href="#apps" class="btn-primary">Lihat Aplikasi</a>
+    <a href="https://wa.me/6281319145059?text=Hai%20Rudi%2C%20nemu%20portfolio%20kamu%20nih.%20Santuy%20ngobrol%20bentar%20gak%3F%20%E2%98%95" target="_blank" class="btn-secondary">Hubungi Saya</a>
+  </div>
+  <div class="scroll-line">Scroll untuk lihat lebih</div>
+</section>
+
+<section class="apps-section" id="apps">
+  <div class="section-header">
+    <h2 class="section-title">Aplikasi</h2>
+    <span class="section-count">2 projects</span>
+  </div>
+
+  <div class="cards-grid">
+
+    <!-- Card 1: Keuangan -->
+    <div class="card">
+      <div class="preview-wrapper finance-bg">
+        <div class="preview-mockup">
+          <div class="mockup-icon">💰</div>
+          <div class="mockup-bars">
+            <div class="mockup-bar full"></div>
+            <div class="mockup-bar med"></div>
+            <div class="mockup-bar short"></div>
+            <div class="mockup-bar full"></div>
+          </div>
+        </div>
+        <div class="preview-overlay"></div>
+      </div>
+      <div class="card-body">
+        <span class="card-tag tag-finance">💰 Keuangan</span>
+        <h3 class="card-title">Pembukuan Ku</h3>
+        <p class="card-desc">Aplikasi pencatatan keuangan pribadi yang simpel dan mudah digunakan. Catat pemasukan, pengeluaran, dan pantau kondisi keuanganmu setiap saat.</p>
+        <div class="card-footer">
+          <div class="card-chips">
+            <span class="chip">Pencatatan</span>
+            <span class="chip">Laporan</span>
+            <span class="chip">Gratis</span>
+          </div>
+          <a href="https://pembukuan-ku.netlify.app/" target="_blank" class="card-link">
+            Buka App
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 2: Arab -->
+    <div class="card">
+      <div class="preview-wrapper arab-bg">
+        <div class="preview-mockup">
+          <div class="mockup-icon">🇸🇦</div>
+          <div class="mockup-bars">
+            <div class="mockup-bar full"></div>
+            <div class="mockup-bar med"></div>
+            <div class="mockup-bar short"></div>
+            <div class="mockup-bar full"></div>
+          </div>
+        </div>
+        <div class="preview-overlay"></div>
+      </div>
+      <div class="card-body">
+        <span class="card-tag tag-edu">🇸🇦 Edukasi</span>
+        <h3 class="card-title">Arab Memory</h3>
+        <p class="card-desc">Kartu memori interaktif untuk belajar kosakata Bahasa Arab dengan cara yang menyenangkan. Cocok untuk pemula maupun yang ingin memperkaya kosakata.</p>
+        <div class="card-footer">
+          <div class="card-chips">
+            <span class="chip">Flashcard</span>
+            <span class="chip">Bahasa Arab</span>
+            <span class="chip">Interaktif</span>
+          </div>
+          <a href="https://arabmemory.netlify.app/" target="_blank" class="card-link orange">
+            Buka App
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>
+          </a>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<footer>
+  <p>© 2026 <span>Rudi Dev</span> — All rights reserved</p>
+  <p>Built with ❤️ & deployed on Ne
